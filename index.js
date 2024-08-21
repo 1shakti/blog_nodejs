@@ -10,9 +10,10 @@ mongoDBConnect("mongodb://localhost:27017/blogify")
   .then(() => console.log("Mongodb connected"))
   .catch((e) => console.log("Mongodb Connection error", e));
 
+//ejs
 app.set("view engine", "ejs");
-app.set("views", path.resolve("./views"));
+app.set("views", path.resolve("./src/views"));
 
-app.get("/", (req, res) => res.end("hello"));
+app.get("/", (req, res) => res.render("home"));
 
 app.listen(PORT, () => console.log(`Server Started at PORT:${PORT}`));
