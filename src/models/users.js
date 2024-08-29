@@ -27,7 +27,7 @@ const UserSchema = new Schema({
     enum: ["USER", "ADMIN"],
     default: "USER",
   },
-});
+},{timestamps: true});
 
 UserSchema.pre("save", function (next) {
   const user = this;
@@ -35,7 +35,7 @@ UserSchema.pre("save", function (next) {
 
   const salt = randomBytes(16).toString();
   const hashedPassword = createHmac("sha256", salt)
-    .update("password")
+    .update(user.password)
     .digest("hex");
 
   user.password = hashedPassword;
@@ -44,19 +44,20 @@ UserSchema.pre("save", function (next) {
   next();
 });
 
-UserSchema.static('matchPassword', async function(email, password){
-    const user = await this.findOne({email})
-    if(!user) throw new Error('User not found.');
-    
-    const salt = user.salt;
-    const hashedPassword = user.password;
+UserSchema.static("matchPassword", async function (email, password) {
+  const user = await this.findOne({ email });
+  if (!user) throw new Error("User not found.");
 
-    const userProvidedHash = createHmac("sha256", salt)
+  const salt = user.salt;
+  const hashedPassword = user.password;
+
+  const userProvidedHash = createHmac("sha256", salt)
     .update(password)
     .digest("hex");
-    if(hashedPassword !== userProvidedHash) throw new Error('incorrect Password');
+  if (hashedPassword !== userProvidedHash)
+    throw new Error("incorrect Password");
 
-    return user;
+  return user;
 });
 
 const User = model("users", UserSchema);
