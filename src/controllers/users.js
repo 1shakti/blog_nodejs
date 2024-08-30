@@ -12,12 +12,28 @@ async function handlePostSignup(req, res) {
 
 async function handlePostSignin(req, res) {
   const { email, password } = req.body;
-  const user = await User.matchPassword(email, password);
-  console.log(user);
-  return res.redirect("/");
+  try {
+    const userToken = await User.matchPasswordAndGenerateToken(email, password);
+    return res
+      .cookie("token", userToken, {
+        httpOnly: true,
+        sameSite: "Lax",
+        maxAge: 3600000,
+      })
+      .redirect("/");
+  } catch (e) {
+    return res.render("signin", {
+      error: e,
+    });
+  }
+}
+
+function handleGetLogout(req, res) {
+  return res.clearCookie("token").redirect("/");
 }
 
 module.exports = {
   handlePostSignup,
   handlePostSignin,
+  handleGetLogout,
 };
