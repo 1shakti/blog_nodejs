@@ -5,6 +5,8 @@ const { mongoDBConnect } = require("./src/config/mongodbConnect");
 const PORT = 8005;
 const app = express();
 
+const Blogs = require('./src/models/blog');
+
 //routes
 const userRoutes = require('./src/routes/users');
 const blogRoutes = require('./src/routes/blog');
@@ -21,10 +23,15 @@ app.set("views", path.resolve("./src/views"));
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(checkForAuthenticationCookie('token'));
+app.use(express.static(path.resolve('./public')));
 
-app.get("/", (req, res) => res.render("home",{
-  user:req.user
-}));
+app.get("/", async (req, res) =>{
+  const allBlogs = await Blogs.find({});
+  return res.render("home",{
+    user:req.user,
+    blogs:allBlogs
+  })
+} );
 app.use("/user", userRoutes);
 app.use("/blog",blogRoutes);
 

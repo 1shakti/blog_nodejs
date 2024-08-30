@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const path = require("path");
-const { handlePostBlog } = require("../controllers/blog");
+const { handleGetBlog, handlePostBlog, handlePostComment } = require("../controllers/blog");
 const multer = require("multer");
 const router = Router();
 
@@ -9,7 +9,6 @@ const storage = multer.diskStorage({
     cb(null, path.resolve("./public/uploads"));
   },
   filename: function (req, file, cb) {
-
     const filename = `${Date.now()}-${file.originalname}`;
     cb(null, filename);
   },
@@ -17,10 +16,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.get("/addNewBlog", (req, res) => {
-  res.render("addBlog");
+router.get("/add-new", (req, res) => {
+  res.render("addBlog", {
+    user: req.user,
+  });
 });
 
+router.get("/:id", handleGetBlog);
+router.post('/comment/:blogId',handlePostComment)
 router.post("/", upload.single("coverImage"), handlePostBlog);
 
 module.exports = router;
