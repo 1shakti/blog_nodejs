@@ -1,8 +1,9 @@
+require('dotenv').config()
 const express = require("express");
 const path = require("path");
 const cookieParser = require('cookie-parser');
 const { mongoDBConnect } = require("./src/config/mongodbConnect");
-const PORT = 8005;
+const PORT = process.env.PORT || 8005;
 const app = express();
 
 const Blogs = require('./src/models/blog');
@@ -13,7 +14,7 @@ const blogRoutes = require('./src/routes/blog');
 const { checkForAuthenticationCookie } = require("./src/middlewares/auth");
 
 //mogodbconnection
-mongoDBConnect("mongodb://localhost:27017/blogify")
+mongoDBConnect(process.env.MONGODB_URL)
   .then(() => console.log("Mongodb connected"))
   .catch((e) => console.log("Mongodb Connection error", e));
 
